@@ -18,7 +18,7 @@ const getUserId = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(STATUS.BAD_REQUEST).send({ message: 'Пользователь не найден' });
+        res.status(STATUS.BAD_REQUEST).send({ message: 'Ошибка ввода данных' });
       } else {
         res.status(STATUS.SERVER_ERROR).send({ message: 'Ошибка сервера' });
       }
