@@ -11,7 +11,7 @@ const deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (!card) {
-        res.status(STATUS.NOT_FOUND).send({ message: 'Запрашиваемая карточка не найдена' });
+        res.status(STATUS.NOT_FOUND).send({ message: 'Карточка не найдена' });
         return;
       }
       res.send({ card });
