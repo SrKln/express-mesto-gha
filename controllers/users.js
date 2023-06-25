@@ -18,7 +18,7 @@ const getUserId = (req, res) => {
       }
     })
     .catch((err) => {
-      if (err.name instanceof Error.CastError) {
+      if (err instanceof Error.CastError) {
         res.status(STATUS.BAD_REQUEST).send({ message: 'Ошибка ввода данных' });
       } else {
         res.status(STATUS.SERVER_ERROR).send({ message: 'Ошибка сервера' });
@@ -32,7 +32,7 @@ const createUser = (req, res) => {
   User.create({ name, about, avatar })
     .then((users) => res.status(STATUS.CREATED).send(users))
     .catch((err) => {
-      if (err.name instanceof Error.ValidationError) {
+      if (err instanceof Error.ValidationError) {
         res.status(STATUS.BAD_REQUEST).send({ message: 'Ошибка ввода данных' });
       } else {
         res.status(STATUS.SERVER_ERROR).send({ message: 'Ошибка сервера' });
@@ -51,7 +51,7 @@ const updateUser = (req, res, updateData) => {
       }
     })
     .catch((err) => {
-      if (err.name instanceof Error.ValidationError) {
+      if (err instanceof Error.ValidationError) {
         res.status(STATUS.BAD_REQUEST).send({ message: 'Перезаполните данные' });
       } else {
         res.status(STATUS.SERVER_ERROR).send({ message: 'Ошибка сервера' });
