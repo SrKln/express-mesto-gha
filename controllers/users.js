@@ -42,7 +42,7 @@ const createUser = (req, res) => {
 
 const updateUser = (req, res, updateData) => {
   const userId = req.user._id;
-  User.findByIdAndUpdate(userId, { updateData }, { new: true, runValidators: true })
+  User.findByIdAndUpdate(userId, updateData, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
         res.status(STATUS.NOT_FOUND).send({ message: 'Пользователь не найден' });
