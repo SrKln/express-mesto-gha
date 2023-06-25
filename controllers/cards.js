@@ -1,3 +1,4 @@
+const { Error } = require('mongoose');
 const Card = require('../models/card');
 const { STATUS } = require('../utils/constants');
 
@@ -17,7 +18,7 @@ const deleteCard = (req, res) => {
       res.send({ card });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err instanceof Error.CastError) {
         res.status(STATUS.BAD_REQUEST).send({ message: 'Перезаполните данные' });
       } else {
         res.status(STATUS.SERVER_ERROR).send({ message: 'Ошибка сервера' });
@@ -31,7 +32,7 @@ const createCard = (req, res) => {
   return Card.create({ name, link, owner: req.user._id })
     .then((card) => res.send(card))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err instanceof Error.ValidationError) {
         res.status(STATUS.BAD_REQUEST).send({ message: 'Перезаполните данные' });
       } else {
         res.status(STATUS.SERVER_ERROR).send({ message: 'Ошибка сервера' });
@@ -53,7 +54,7 @@ const likeCard = (req, res) => {
       res.send({ card });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err instanceof Error.CastError) {
         res.status(STATUS.BAD_REQUEST).send({ message: 'Перезаполните данные' });
       } else {
         res.status(STATUS.SERVER_ERROR).send({ message: 'Ошибка сервера' });
@@ -75,7 +76,7 @@ const dislikeCard = (req, res) => {
       res.status(STATUS.OK).send({ data: card });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err instanceof Error.CastError) {
         res.status(STATUS.BAD_REQUEST).send({ message: 'Перезаполните данные' });
       } else {
         res.status(STATUS.SERVER_ERROR).send({ message: 'Ошибка сервера' });
