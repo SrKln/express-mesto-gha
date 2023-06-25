@@ -4,6 +4,7 @@ const { STATUS } = require('../utils/constants');
 
 const getCards = (req, res) => {
   Card.find({})
+    .populate('owner')
     .then((cards) => res.status(STATUS.OK).send(cards))
     .catch(() => res.status(STATUS.SERVER_ERROR).send({ message: 'Ошибка сервера' }));
 };
@@ -46,6 +47,7 @@ const likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
+    .populate('likes')
     .then((card) => {
       if (!card) {
         res.status(STATUS.NOT_FOUND).send({ message: 'Карточка не найдена' });
@@ -68,6 +70,7 @@ const dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
+    .populate('likes')
     .then((card) => {
       if (!card) {
         res.status(STATUS.NOT_FOUND).send({ message: 'Карточка не найдена' });
