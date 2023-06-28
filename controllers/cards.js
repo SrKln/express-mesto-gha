@@ -18,10 +18,10 @@ const deleteCard = (req, res, next) => {
       if (!card) {
         throw new NotFoundError('Карточка не найдена');
       }
-      if (card.owner.toString() !== req.user._id) {
+      if (card.owner.toString() !== req.user._id.toString()) {
         throw new ForbiddenError('Недостаточно прав');
       }
-      return Card.findByIdAndRemove(req.params.cardId);
+      return card.deleteOne();
     })
     .then(() => res.status(STATUS.OK))
     .catch((err) => {
