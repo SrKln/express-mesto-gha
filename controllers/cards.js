@@ -1,47 +1,51 @@
 const { Error } = require('mongoose');
 const Card = require('../models/card');
 const { STATUS } = require('../utils/constants');
+const ForbiddenError = require('../utils/errors/ForbiddenError');
+const NotFoundError = require('../utils/errors/NotFoundError');
+const BadRequestError = require('../utils/errors/BadRequestError');
 
-const getCards = (req, res) => {
+const getCards = (req, res, next) => {
   Card.find({})
     .populate('owner')
     .then((cards) => res.status(STATUS.OK).send(cards))
-    .catch(() => res.status(STATUS.SERVER_ERROR).send({ message: 'Ошибка сервера' }));
+    .catch(next);
 };
 
-const deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
+const deleteCard = (req, res, next) => {
+  Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
-        res.status(STATUS.NOT_FOUND).send({ message: 'Карточка не найдена' });
-        return;
+        throw new NotFoundError('Карточка не найдена');
       }
-      res.send({ card });
+      if (card.owner === req.userId) {
+        Card.findByIdAndRemove(req.params.cardId);
+      } else {
+        throw new ForbiddenError('Недостаточно прав');
+      }
     })
     .catch((err) => {
       if (err instanceof Error.CastError) {
-        res.status(STATUS.BAD_REQUEST).send({ message: 'Перезаполните данные' });
-      } else {
-        res.status(STATUS.SERVER_ERROR).send({ message: 'Ошибка сервера' });
+        return next(new BadRequestError('Перезаполните данные'));
       }
+      return next(err);
     });
 };
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
 
   return Card.create({ name, link, owner: req.user._id })
     .then((card) => res.send(card))
     .catch((err) => {
       if (err instanceof Error.ValidationError) {
-        res.status(STATUS.BAD_REQUEST).send({ message: 'Перезаполните данные' });
-      } else {
-        res.status(STATUS.SERVER_ERROR).send({ message: 'Ошибка сервера' });
+        return next(new BadRequestError('Перезаполните данные'));
       }
+      return next(err);
     });
 };
 
-const likeCard = (req, res) => {
+const likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
@@ -50,21 +54,19 @@ const likeCard = (req, res) => {
     .populate('likes')
     .then((card) => {
       if (!card) {
-        res.status(STATUS.NOT_FOUND).send({ message: 'Карточка не найдена' });
-        return;
+        throw new NotFoundError('Карточка не найдена');
       }
       res.send({ card });
     })
     .catch((err) => {
       if (err instanceof Error.CastError) {
-        res.status(STATUS.BAD_REQUEST).send({ message: 'Перезаполните данные' });
-      } else {
-        res.status(STATUS.SERVER_ERROR).send({ message: 'Ошибка сервера' });
+        return next(new BadRequestError('Перезаполните данные'));
       }
+      return next(err);
     });
 };
 
-const dislikeCard = (req, res) => {
+const dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
@@ -80,10 +82,9 @@ const dislikeCard = (req, res) => {
     })
     .catch((err) => {
       if (err instanceof Error.CastError) {
-        res.status(STATUS.BAD_REQUEST).send({ message: 'Перезаполните данные' });
-      } else {
-        res.status(STATUS.SERVER_ERROR).send({ message: 'Ошибка сервера' });
+        return next(new BadRequestError('Перезаполните данные'));
       }
+      return next(err);
     });
 };
 
