@@ -84,7 +84,7 @@ const updateUser = (req, res, updateData, next) => {
       if (!user) {
         throw new NotFoundError('Пользователь не найден');
       } else {
-        res.send({ user });
+        res.send(user);
       }
     })
     .catch((err) => {
@@ -111,7 +111,7 @@ const getCurrentUser = (req, res, next) => {
       if (!user) {
         res.status(STATUS.NOT_FOUND).send({ message: 'Пользователь не найден' });
       } else {
-        res.send({ user });
+        res.send(user);
       }
     })
     .catch((err) => {
