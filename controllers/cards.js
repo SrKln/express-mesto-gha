@@ -13,18 +13,23 @@ const getCards = (req, res, next) => {
 };
 
 const deleteCard = (req, res, next) => {
-  Card.findById(req.params)
+  Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Карточка не найдена');
-      } else if (card.owner.toString() !== req.user._id.toString()) {
+      }
+      if (card.owner.toString() !== req.user._id.toString()) {
         throw new ForbiddenError('Недостаточно прав');
       }
-      Card.findByIdAndRemove(req.params)
-        .then((removedCard) => res.status(STATUS.OK).send(removedCard))
-        .catch(next);
+      return card.deleteOne();
     })
-    .catch(next);
+    .then(() => res.status(STATUS.OK))
+    .catch((err) => {
+      if (err instanceof Error.CastError) {
+        return next(new BadRequestError('Перезаполните данные'));
+      }
+      return next(err);
+    });
 };
 
 const createCard = (req, res, next) => {
