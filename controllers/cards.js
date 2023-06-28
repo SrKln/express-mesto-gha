@@ -18,12 +18,12 @@ const deleteCard = (req, res, next) => {
       if (!card) {
         throw new NotFoundError('Карточка не найдена');
       }
-      if (card.owner.toString() === req.user._id) {
-        Card.findByIdAndRemove(req.params.cardId);
-      } else {
+      if (!card.owner.toString() === req.user._id) {
         throw new ForbiddenError('Недостаточно прав');
       }
+      return Card.findByIdAndRemove(req.params.cardId);
     })
+    .then(() => res.status(STATUS.OK))
     .catch((err) => {
       if (err instanceof Error.CastError) {
         return next(new BadRequestError('Перезаполните данные'));
