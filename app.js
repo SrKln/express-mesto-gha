@@ -14,13 +14,12 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
 app.use(router);
 app.use(errors());
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
   // если у ошибки нет статуса, выставляем 500
   const { statusCode = 500 } = err;
   const message = statusCode === 500 ? 'На сервере произошла ошибка' : err.message;
-  res
-    .status(statusCode)
-    .send({ message });
+  res.status(statusCode).send({ message });
+  next();
 });
 
 app.listen(PORT, () => {
