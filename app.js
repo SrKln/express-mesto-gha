@@ -14,7 +14,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
 app.use(router);
 app.use(errors());
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   // если у ошибки нет статуса, выставляем 500
   const { statusCode = 500, message } = err;
 
@@ -23,10 +23,9 @@ app.use((err, req, res, next) => {
     .send({
       // проверяем статус и выставляем сообщение в зависимости от него
       message: statusCode === 500
-        ? 'На сервере произошла  ошибка'
+        ? 'На сервере произошла ошибка'
         : message,
     });
-  // next();
 });
 
 app.listen(PORT, () => {
