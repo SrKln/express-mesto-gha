@@ -1,12 +1,20 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
 
 const { PORT = 3000 } = process.env;
+const { limiterConfig } = require('./utils/config');
 
 const app = express();
 
 const router = require('./routes');
+const centralizedErrorHandler = require('./middlewares/centralizedErrorHandler');
+
+app.use(helmet());
+const limiter = rateLimit(limiterConfig);
+app.use(limiter);
 
 app.use(express.json());
 
@@ -14,13 +22,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
 app.use(router);
 app.use(errors());
-app.use((err, req, res, next) => {
-  // если у ошибки нет статуса, выставляем 500
-  const { statusCode = 500 } = err;
-  const message = statusCode === 500 ? 'На сервере произошла ошибка' : err.message;
-  res.status(statusCode).send({ message });
-  next();
-});
+app.use(centralizedErrorHandler);
 
 app.listen(PORT, () => {
   console.log('Сервер запущен');

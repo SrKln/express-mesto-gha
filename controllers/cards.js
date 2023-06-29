@@ -23,7 +23,7 @@ const deleteCard = (req, res, next) => {
       }
       return card.deleteOne();
     })
-    .then(() => res.status(STATUS.OK))
+    .then(() => res.send({ message: 'Карточка удалена' }))
     .catch((err) => {
       if (err instanceof Error.CastError) {
         return next(new BadRequestError('Перезаполните данные'));
@@ -78,7 +78,7 @@ const dislikeCard = (req, res, next) => {
         res.status(STATUS.NOT_FOUND).send({ message: 'Карточка не найдена' });
         return;
       }
-      res.status(STATUS.OK).send({ data: card });
+      res.send({ data: card });
     })
     .catch((err) => {
       if (err instanceof Error.CastError) {
